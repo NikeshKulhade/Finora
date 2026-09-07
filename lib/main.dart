@@ -8,11 +8,15 @@ import 'core/config/supabase_config.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (SupabaseConfig.isConfigured) {
-    await Supabase.initialize(
-      url: SupabaseConfig.url,
-      publishableKey: SupabaseConfig.anonKey,
-    );
-    SupabaseConfig.initialized = true;
+    try {
+      await Supabase.initialize(
+        url: SupabaseConfig.url,
+        publishableKey: SupabaseConfig.anonKey,
+      ).timeout(const Duration(seconds: 10));
+      SupabaseConfig.initialized = true;
+    } catch (_) {
+      // The local dashboard remains available when cloud services are offline.
+    }
   }
   runApp(const ProviderScope(child: FinoraApp()));
 }
